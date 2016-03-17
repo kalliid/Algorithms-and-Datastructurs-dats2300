@@ -1,5 +1,6 @@
 package course.requirements.one;
 
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 /**
@@ -76,6 +77,28 @@ public class Requirement {
         }
 
         return a;
+    }
+
+    /**
+     * @return a number with only 0, 1, 2, 3, 4 and 5,
+     * equals a number with the Integer-representation of base6.
+     * Number 100000 == 6^4 = 1296 and 55555 == 6^5 -1 == 7775.
+     */
+    public static int generateNumber()
+    {
+        int number = 0;
+        int ceiling = 7775;
+        int floor = 1296;
+
+        for(int i = floor; i < ceiling; i++)
+        {
+            char[] chars = Integer.toString(i, 6).toCharArray();
+            int[] a = new int[6];
+            for(char c : chars)
+                a[c - '0']++;
+            if(max(a) < 3) number++;
+        }
+        return number;
     }
 
     public static int max(int[] a, int i, int j)
