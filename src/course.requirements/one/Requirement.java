@@ -222,6 +222,59 @@ public class Requirement {
         return index;
     }
 
+    public static int[] thirdMin(int[] a)
+    {
+        int n = a.length;
+        if(n < 3)
+            throw new IllegalArgumentException("Illegal interval!");
+
+        int[] index = {0, 1, 2};
+
+        int min = min(a);
+        int max = max(a);
+
+        for(int i = 0; i < 3; i++)
+        {
+            if(a[i] <= min)
+            {
+                min = a[i];
+                index[0] = i;
+            }
+            if(a[i] >= max)
+            {
+                max = a[i];
+                index[2] = i;
+            }
+        }
+
+        index[1] = Math.abs( (index[0] + index[2] - 3));
+
+        return index;
+    }
+
+    public static int min(int[] a)
+    {
+        return min(a, 0, a.length);
+    }
+
+    public static int min(int[] a, int from, int to)
+    {
+        if(from < 0 || to > a.length || from >= to)
+            throw new IllegalArgumentException("Illegal argument!");
+
+        int min = from;
+        int minValue = a[min];
+
+        for(int i = (from + 1); i < to; i++)
+            if(a[i] < minValue)
+            {
+                min = i;
+                minValue = a[min];
+            }
+
+        return minValue;
+    }
+
     public static int characterNumber(char character)
     {
         if(character <= 'Z') return character - 'A'; // A->0, B->1, C->2...
