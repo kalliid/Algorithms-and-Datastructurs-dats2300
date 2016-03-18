@@ -1,6 +1,5 @@
 package course.requirements.one;
 
-import java.util.Map;
 import java.util.NoSuchElementException;
 
 /**
@@ -66,7 +65,7 @@ public class Requirement {
         return p;
     }
 
-    public static int[] sorting(int[] a)
+    public static int[] sort(int[] a)
     {
         int m;
 
@@ -178,6 +177,49 @@ public class Requirement {
             }
             c[i + k] = value;
         }
+    }
+
+    public static String merge(String s, String t)
+    {
+        int i = 0;
+        int j = 0;
+        int k = 0;
+
+        char[] array1 = s.toCharArray();
+        char[] array2 = t.toCharArray();
+        char[] finalf = new char[s.length() + t.length()];
+
+        while(i < s.length() && j < t.length())
+        {
+            finalf[k++] = array1[i++];
+            finalf[k++] = array1[j++];
+        }
+
+        while(i < s.length())
+        {
+            finalf[k++] = array1[i++];
+        }
+
+        while(j < t.length())
+        {
+            finalf[k++] = array2[j++];
+        }
+
+        return String.valueOf(finalf);
+    }
+
+    public static int[] index(int[] a)
+    {
+        if(a.length < 3)
+            throw new NoSuchElementException("Illegal interval!");
+
+        int[] index = {0, 1, 2};
+
+        if(a[index[0]] > a[index[1]]) swap(index, 0, 1);
+        if(a[index[1]] > a[index[2]]) swap(index, 1, 2);
+        if(a[index[0]] > a[index[1]]) swap(index, 0, 1);
+
+        return index;
     }
 
     public static int max(int[] a, int i, int j)
