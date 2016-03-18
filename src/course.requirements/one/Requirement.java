@@ -101,6 +101,85 @@ public class Requirement {
         return number;
     }
 
+    public static int numDiffUnsorted(int[] a)
+    {
+        int max = 0;
+
+        int[] temp = new int[a.length];
+
+        if(a.length == 0)
+            return 0;
+
+        for(int i = 0; i < a.length; i++)
+            for(int j = (i+1); j < a.length; j++)
+                if(a[i] == a[j])
+                    temp[i] = -1;
+
+        for (int aTemp : temp)
+            if (aTemp != -1)
+                max++;
+
+        return max;
+    }
+
+    public static char[] rotation(char[] a)
+    {
+        int n = a.length;
+
+        if(n < 2)
+            return a;
+
+        if(n == 2)
+        {
+            char temp = a[0];
+            a[0] = a[1];
+            a[1] = temp;
+            return a;
+        }
+
+        char[] b = new char[n];
+
+        b[0] = a[n - 1];
+
+        System.arraycopy(a, 0, b, 1, n - 1);
+        System.arraycopy(b, 0, a, 0, n);
+
+        return a;
+    }
+
+    // Euklids algorithm
+    public static int gcd(int a, int b)
+    {
+        return b == 0 ? a : gcd(b, a % b);
+    }
+
+    public static void rotation(char[] c, int k)
+    {
+        int n = c.length;
+
+        if(n < 2)
+            return;
+
+        if((k %= n) < 0)
+            k += n;
+
+        int s = gcd(n, k);
+
+        for(int i = 0; i < s; i++)
+        {
+            char value = c[i];
+            for(int j = (i - k), l = i; j != i; j -= k)
+            {
+                if(j < 0)
+                    j += n;
+
+                c[l] = c[j];
+                l = j;
+            }
+            c[i + k] = value;
+        }
+    }
+
     public static int max(int[] a, int i, int j)
     {
         throw new IllegalStateException("Not done yet.");
