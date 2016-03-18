@@ -222,6 +222,29 @@ public class Requirement {
         return index;
     }
 
+    public static int characterNumber(char character)
+    {
+        if(character <= 'Z') return character - 'A'; // A->0, B->1, C->2...
+        if(character == 'Ø') return 27; // Ø->27
+        if(character == 'Å') return 28; // Å->28
+        else return 26; // Æ->26
+    }
+
+    public static boolean contained(String a, String b)
+    {
+        if(a.length() > b.length())
+            return false;
+
+        int[] number = new int[29];
+
+        for(int i = 0; i < a.length(); i++) number[characterNumber(a.charAt(i))]++;
+        for(int i = 0; i < b.length(); i++) number[characterNumber(b.charAt(i))]--;
+
+        for(int i = 0; i < number.length; i++) if(number[i] > 0) return false;
+
+        return true;
+    }
+
     public static int max(int[] a, int i, int j)
     {
         throw new IllegalStateException("Not done yet.");
