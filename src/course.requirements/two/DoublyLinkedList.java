@@ -1,6 +1,8 @@
 package course.requirements.two;
 
+import java.util.ConcurrentModificationException;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 
 /**
@@ -180,23 +182,125 @@ public class DoublyLinkedList<T> implements List<T>  {
     }
 
     @Override
-    public T update(int index, T value) {
-        return null;
+    public T update(int index, T value)
+    {
+        Objects.requireNonNull(value);
+
+        indexControl(index, false);
+
+        Node<T> temp = findNode(index);
+
+        T old = temp.value;
+        temp.value = value;
+        numberOfChanges++;
+        return old;
     }
 
     @Override
-    public boolean remove(T value) {
-        return false;
+    public boolean remove(T value)
+    {
+        if(value == null || size == 0)
+            return false;
+
+        if(size == 1)
+        {
+            if(value.equals(head.value))
+            {
+                head.value = null;
+                head = null;
+                numberOfChanges++;
+                size--;
+                return true;
+            }
+
+            return false;
+        }
+
+        Node<T> q = head, p = null;
+
+        while(q != null)
+        {
+            if(q.value.equals(value)) break;
+            p = q;
+            q = q.next;
+        }
+
+        if(q == null) return false;
+
+        if(q == head)
+        {
+            head = head.next;
+            head.previous = null;
+        }
+        else if(q == tail)
+        {
+            tail = p;
+            tail.next = null;
+
+        } else {
+            p.next = q.next;
+            p.next.previous = p;
+        }
+
+        q.value = null;
+        q.previous = null;
+        q.next = null;
+        size--;
+        numberOfChanges++;
+
+        return true;
+
     }
 
     @Override
     public T remove(int index) {
-        return null;
+
+        indexControl(index, false);
+
+        if(size == 0)
+            return null;
+
+        if(index == 0)
+        {
+            if(size == 1)
+            {
+                Node<T> temp = head;
+                head = tail = null;
+                numberOfChanges++;
+                size--;
+                return temp.value;
+            }
+
+            Node<T> temp = head;
+            head = head.next;
+            head.previous = null;
+            numberOfChanges++;
+            size--;
+            return temp.value;
+        }
+
+        if(index == (size - 1))
+        {
+            Node<T> temp = tail;
+            tail = tail.previous;
+            tail.next = null;
+            numberOfChanges++;
+            size--;
+            return temp.value;
+        }
+
+        Node<T> temp = findNode(index);
+        Node<T> p = temp.previous;
+        p.next = p.next.next;
+        p.next.previous = p;
+        numberOfChanges++;
+        size--;
+        return temp.value;
     }
 
     @Override
     public int size() {
-        throw new UnsupportedOperationException("Not done yet.");
+        return size;
     }
 
     @Override
@@ -206,12 +310,68 @@ public class DoublyLinkedList<T> implements List<T>  {
 
     @Override
     public void clear() {
+        for(Node<T> temp = head; temp != null; temp = temp.next)
+        {
+            temp.value = null;
+            if(temp.previous != null)
+                temp.previous.next = null;
+            temp.previous = null;
+        }
 
+        head = tail = null;
+
+        size = 0;
+
+        numberOfChanges++;
+    }
+
+    @Override
+    public String toString()
+    {
+        Node<T> temp = head;
+        StringBuilder sb = new StringBuilder("[");
+
+
+        while(temp != null)
+        {
+            sb.append(temp.value);
+            if(temp.next != null)
+                sb.append(",");
+
+            temp = temp.next;
+        }
+
+        sb.append("]");
+
+        return sb.toString();
+    }
+
+    public String reversedString()
+    {
+        Node<T> temp = tail;
+        StringBuilder sb = new StringBuilder("[");
+
+        while(temp != null)
+        {
+            sb.append(temp.value);
+            if(temp.previous != null)
+                sb.append(",");
+
+            temp = temp.previous;
+        }
+
+        sb.append("]");
+
+        return sb.toString();
     }
 
     @Override
     public Iterator<T> iterator() {
         return new DoublyLinkedListIterator();
+    }
+
+    public Iterator<T> iterator(int index){
+        return new DoublyLinkedListIterator(index);
     }
 
     private class DoublyLinkedListIterator implements Iterator<T>
@@ -220,19 +380,70 @@ public class DoublyLinkedList<T> implements List<T>  {
         private boolean removeOk;
         private int expectedNumChanges;
 
+        private DoublyLinkedListIterator()
+        {
+            current = head;
+            removeOk = false;
+            expectedNumChanges = numberOfChanges;
+        }
+
+        private DoublyLinkedListIterator(int index)
+        {
+            indexControl(index, false);
+            current = head;
+            removeOk = false;
+            expectedNumChanges = numberOfChanges;
+            for(int i = 0; i < index; i++) next();
+        }
+
         @Override
         public boolean hasNext() {
             return current != null;
         }
 
         @Override
-        public T next() {
-            throw new UnsupportedOperationException("Not done yet.");
+        public T next()
+        {
+            if(!hasNext())
+                throw new NoSuchElementException("The list has no more entries.");
+
+            if(expectedNumChanges != numberOfChanges)
+                throw new ConcurrentModificationException("expected number of changes: "
+                        + expectedNumChanges + "\nactual number of changes: " + numberOfChanges);
+
+            Objects.requireNonNull(current);
+            removeOk = true;
+            current = current.next;
+            return current.previous.value;
         }
 
         public void remove()
         {
-            throw new UnsupportedOperationException("Not done yet.");
+            if(!removeOk)
+                throw new IllegalStateException("Cannot remove object before use of next()");
+
+            if(expectedNumChanges != numberOfChanges)
+                throw new ConcurrentModificationException("expected number of changes: "
+                        + expectedNumChanges + "\nactual number of changes: " + numberOfChanges);
+
+            removeOk = false;
+
+            if(size == 1) head = tail = null;
+            else if(current == null){
+                tail = tail.previous;
+                tail.next = null;
+            }
+            else if(current.previous == head){
+                head = head.next;
+                head.previous = null;
+            } else {
+                current.previous = current.previous.previous;
+                current.previous.next = current;
+            }
+
+            size--;
+            numberOfChanges++;
+            expectedNumChanges++;
         }
     }
 }
