@@ -1,4 +1,6 @@
-package course.requirements.two;
+package io.osvold.algdat.requirements.two;
+
+import io.osvold.algdat.requirements.interfaces.List;
 
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
@@ -8,7 +10,7 @@ import java.util.Objects;
 /**
  * Created by hans on 18.03.16.
  */
-public class DoublyLinkedList<T> implements List<T>  {
+public class DoublyLinkedList<T> implements List<T> {
 
     private static final class Node<T>
     {
@@ -413,8 +415,9 @@ public class DoublyLinkedList<T> implements List<T>  {
 
             Objects.requireNonNull(current);
             removeOk = true;
+            T temp = current.value;
             current = current.next;
-            return current.previous.value;
+            return temp;
         }
 
         public void remove()

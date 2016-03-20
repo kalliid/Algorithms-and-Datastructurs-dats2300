@@ -1,4 +1,4 @@
-package course.requirements.one;
+package io.osvold.algdat.requirements.one;
 
 import java.util.NoSuchElementException;
 

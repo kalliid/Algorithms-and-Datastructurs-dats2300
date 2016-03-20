@@ -1,4 +1,4 @@
-package course.requirements.two;
+package io.osvold.algdat.requirements.interfaces;
 
 import java.util.Iterator;
 

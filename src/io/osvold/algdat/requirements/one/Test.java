@@ -1,4 +1,4 @@
-package course.requirements.one;
+package io.osvold.algdat.requirements.one;
 
 /**
  * Created by hans on 17.03.16.
