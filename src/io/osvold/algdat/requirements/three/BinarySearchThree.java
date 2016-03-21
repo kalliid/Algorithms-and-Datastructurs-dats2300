@@ -62,7 +62,25 @@ public class BinarySearchThree<T> implements Container<T> {
 
     @Override
     public void clear() {
+        if(!isEmpty()) clear(root);
+        root = null;
+        size = 0;
+    }
 
+    private void clear(Node<T> p)
+    {
+        if(p.left != null)
+        {
+            clear(p.left);
+            p.left = null;
+        }
+        if(p.right != null)
+        {
+            clear(p.right);
+            p.right = null;
+        }
+        p.value = null;
+        p.root = null;
     }
 
     @Override
@@ -117,9 +135,85 @@ public class BinarySearchThree<T> implements Container<T> {
     }
 
     @Override
-    public boolean remove(T t) {
-        return false;
+    public boolean remove(T value) {
+        if(value == null)
+            return false;
+
+        Node<T> p = root, q = null;
+
+        while(p != null)
+        {
+            int cmp = comparator.compare(value, p.value);
+            if(cmp < 0)
+            {
+                q = p;
+                p = p.left;
+            }
+            else if(cmp > 0)
+            {
+                q = p;
+                p = p.right;
+            } else break;
+        }
+
+        if(p == null) return false;
+
+        if(p.left == null || p.right == null)
+        {
+            Node<T> b = p.left != null ? p.left : p.right;
+
+            if(b != null) b.root = q;
+
+            if(p == root) root = b;
+            else if(p == q.left) q.left = b;
+            else q.right = b;
+        } else {
+
+            Node<T> s = p, r = p.right;
+            while(r.left != null)
+            {
+                s = r;
+                r = r.left;
+            }
+
+            p.value = r.value;
+
+            if(r.right != null) r.right.root = s;
+
+            if(s != p) s.left = r.right;
+            else s.right = r.right;
+        }
+
+        size--;
+        changes++;
+        return true;
     }
+
+    public int removeAll(T value)
+    {
+        int nRemoved = 0;
+        while(remove(value)) nRemoved++;
+        return nRemoved;
+    }
+
+    public int count(T value)
+    {
+        Node<T> p = root;
+        int nValues = 0;
+
+        while(p != null)
+        {
+            int cmp = comparator.compare(value, p.value);
+            if(cmp < 0) p = p.left;
+            else
+            {
+                if(cmp == 0) nValues++;
+                p = p.right;
+            }
+        }
+        return nValues;
+    }
+
 
     @Override
     public Iterator<T> iterator() {
