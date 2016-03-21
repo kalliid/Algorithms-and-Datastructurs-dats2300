@@ -5,6 +5,7 @@ import io.osvold.algdat.requirements.interfaces.Container;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Objects;
+import java.util.StringJoiner;
 
 /**
  * Created by hans on 20.03.16.
@@ -214,6 +215,38 @@ public class BinarySearchThree<T> implements Container<T> {
         return nValues;
     }
 
+    private static <T> Node<T> nextInorder(Node<T> node)
+    {
+        if(node.right != null)
+        {
+            node = node.right;
+            while(node.left != null) node = node.left;
+        } else
+            while(node.root != null && node == node.root) node = node.root;
+
+        node = node.root;
+
+        return node;
+    }
+
+    @Override
+    public String toString()
+    {
+        if(isEmpty()) return "[]";
+
+        StringJoiner stringJoiner = new StringJoiner(",", "[", "]");
+
+        Node<T> node = root;
+
+        while(node.left != null) node = node.left;
+
+        while(node != null) {
+            stringJoiner.add(node.value.toString());
+            node = nextInorder(node);
+        }
+
+        return stringJoiner.toString();
+    }
 
     @Override
     public Iterator<T> iterator() {
