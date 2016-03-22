@@ -1,11 +1,8 @@
 package io.osvold.algdat.requirements.three;
 
-import io.osvold.algdat.requirements.interfaces.Container;
+import io.osvold.algdat.requirements.interfaces.*;
 
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.Objects;
-import java.util.StringJoiner;
+import java.util.*;
 
 /**
  * Created by hans on 20.03.16.
@@ -248,8 +245,99 @@ public class BinarySearchThree<T> implements Container<T> {
         return stringJoiner.toString();
     }
 
+    public String reversedString()
+    {
+        if(isEmpty()) return "[]";
+
+        Stack<Node<T>> stack = new Stack<>();
+        StringJoiner stringJoiner = new StringJoiner(",", "[", "]");
+
+        Node<T> node = root;
+        while(root.right != null)
+        {
+            stack.add(node);
+            node = node.right;
+        }
+
+        while(true)
+        {
+            stringJoiner.add(node.value.toString());
+
+            if(node.left != null)
+            {
+                node = node.left;
+                while(node.right != null)
+                {
+                    stack.add(node);
+                    node = node.right;
+                }
+            }
+            else if(!stack.isEmpty()) node = stack.pop();
+            else break;
+        }
+
+        return stringJoiner.toString();
+    }
+
+    public String rightBranch()
+    {
+        StringJoiner stringJoiner = new StringJoiner(",", "[", "]");
+        if(!isEmpty())
+        {
+            Node<T> node = root;
+            while(true)
+            {
+                stringJoiner.add(node.value.toString());
+                if(node.right != null) node = node.right;
+                else if(node.left != null) node = node.left;
+                else break;
+            }
+        }
+        return stringJoiner.toString();
+    }
+
     @Override
     public Iterator<T> iterator() {
-        return null;
+        return new LeafNodeIterator();
+    }
+
+    private class LeafNodeIterator implements Iterator<T>
+    {
+
+        private Node<T> p = root, q = null;
+        private boolean removeOK = false;
+
+        public LeafNodeIterator() {
+            if (p == null) return;
+
+            while (true) {
+                if (p.left != null) p = p.left;
+                else if (p.right != null) p = p.right;
+                else break;
+            }
+        }
+
+        @Override
+        public boolean hasNext() {
+            return p != null;
+        }
+
+        @Override
+        public T next() {
+            if(!hasNext())
+                throw new NoSuchElementException("No more values left.");
+
+            removeOK = true;
+
+            q = p;
+
+            while(true)
+            {
+                p = nextInorder(p);
+                if(p == null || (p.left == null && p.right == null)) break;
+            }
+
+            return q.value;
+        }
     }
 }
